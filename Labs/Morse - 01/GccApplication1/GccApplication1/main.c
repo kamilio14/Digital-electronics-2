@@ -11,7 +11,7 @@
 
 /* Defines -----------------------------------------------------------*/
 #define LED_GREEN   PB5     // AVR pin where green LED is connected
-#define SHORT_DELAY 500    // Delay in miliseconds
+#define SHORT_DELAY 300   // Delay in miliseconds
 #ifndef F_CPU
 #define F_CPU 16000000      // CPU frequency in Hz required for delay func
 #endif
@@ -84,11 +84,7 @@ int main(void)
 		PORTB = PORTB ^ (1<<LED_GREEN);  // zapnutie
 		_delay_ms(SHORT_DELAY);
 		
-		PORTB = PORTB ^ (1<<LED_GREEN);  // vypnutie
-		_delay_ms(SHORT_DELAY);
 		
-		PORTB = PORTB ^ (1<<LED_GREEN);  // zapnutie
-		_delay_ms(SHORT_DELAY);
 		
 		
 		PORTB = PORTB ^ (1<<LED_GREEN);  // vypnutie
@@ -110,6 +106,12 @@ int main(void)
 		PORTB = PORTB ^ (1<<LED_GREEN);  // zapnutie
 		_delay_ms(SHORT_DELAY);
 		_delay_ms(SHORT_DELAY);
+		
+		PORTB = PORTB ^ (1<<LED_GREEN);  // vypnutie
+		_delay_ms(SHORT_DELAY);
+		_delay_ms(SHORT_DELAY);
+		_delay_ms(SHORT_DELAY);
+_delay_ms(SHORT_DELAY);_delay_ms(SHORT_DELAY);		
 		
 		
 		
@@ -124,7 +126,7 @@ int main(void)
 
         // Invert LED in Data Register
         // PORTB = PORTB xor 0010 0000
-        PORTB = PORTB ^ (1<<LED_GREEN);
+        
     }
 
     // Will never reach this
