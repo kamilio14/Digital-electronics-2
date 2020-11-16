@@ -111,7 +111,6 @@ ISR(ADC_vect)
 	
 	//send data via UArt
 	
-		
 	uart_puts("ADC value in decimal: ");
 	uart_puts(lcd_string);
 	uart_puts("\r\n");
@@ -130,12 +129,11 @@ ISR(ADC_vect)
 	lcd_puts("          ");
 	
 	lcd_gotoxy(8,1);
- 	if(value > 1018)
+	if(value > 1018)
  	{
 	 	lcd_puts("None");
-	 	
-	 	
- 	}
+	}
+	
  	if(value > 10 && value < 200)
  	{
 	 	lcd_puts("UP");
@@ -159,9 +157,20 @@ ISR(ADC_vect)
  	}
 	 
 	int storage[32];
-	int i = 0,j,parity = 0;
+	int i = 0,j;
+	int parity = 0;  
 	
-	while (value>0)
+	if(value > 1000)
+	{
+		parity = 0;
+		itoa(parity, lcd_string, 10);
+		lcd_gotoxy(15,1);
+		lcd_puts(lcd_string);
+	}
+	else
+	{
+	
+	while (value>0)						// calculating and displaying odd parity
 	{
 		storage[i] = value % 2;
 		value = value/2;
@@ -183,4 +192,6 @@ ISR(ADC_vect)
 	lcd_puts(lcd_string);
 
 	
+		
+	}
 }
