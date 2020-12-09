@@ -41,9 +41,9 @@
 #define TIM2_overflow_128us()   TCCR2B &= ~((1<<CS22) | (1<<CS20)); TCCR2B |= (1<<CS21);	// 0 1 0
 #define TIM2_overflow_512us()   TCCR2B &= ~(1<<CS22); TCCR2B |= ((1<<CS21) | (1<<CS20));	// 0 1 1
 #define TIM2_overflow_1ms()     TCCR2B &= ~((1<<CS21) | (1<<CS20)); TCCR2B |= (1<<CS22);	// 1 0 0
-#define TIM2_overflow_2ms()     TCCR2B &= ~(1<<CS21); TCCR2B |= (1<<CS22) | (1<<CS20);		// 1 0 1
-#define TIM2_overflow_4ms()     TCCR2B &= ~(1<<CS20); TCCR2B |= (1<<CS22) | (1<<CS21);		// 1 1 0
-#define TIM2_overflow_16ms()    TCCR2B |= (1<<CS22) | (1<<CS21) | (1<<CS20);				// 1 1 1
+#define TIM2_overflow_2ms()     TCCR2B &= ~(1<<CS21); TCCR2B |= (1<<CS22) | (1<<CS20);		
+#define TIM2_overflow_4ms()     TCCR2B &= ~(1<<CS20); TCCR2B |= (1<<CS22) | (1<<CS21);		
+#define TIM2_overflow_16ms()    TCCR2B |= (1<<CS22) | (1<<CS21) | (1<<CS20);				
 
 /**
  * @brief Defines interrupt enable/disable modes for Timer/Counter1.
