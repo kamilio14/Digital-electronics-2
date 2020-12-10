@@ -27,11 +27,86 @@
 #include "uart.h"           // Peter Fleury's UART library
  
 // Global variables
-static uint8_t counter = 0; // overflow counter value set to 0
+static uint16_t counter = 0; // overflow counter value set to 0
 static uint8_t keypad = 0;  // keypad value set to 0
 
-// Look-up table for sine wave generation
+int sine[256]= {128,131,134,137,140,143,146,149,152,156,159,162,165,168,171,174,
+	176,179,182,185,188,191,193,196,199,201,204,206,209,211,213,216,
+	218,220,222,224,226,228,230,232,234,235,237,239,240,242,243,244,
+	246,247,248,249,250,251,251,252,253,253,254,254,254,255,255,255,
+	255,255,255,255,254,254,253,253,252,252,251,250,249,248,247,246,
+	245,244,242,241,239,238,236,235,233,231,229,227,225,223,221,219,
+	217,215,212,210,207,205,202,200,197,195,192,189,186,184,181,178,
+	175,172,169,166,163,160,157,154,151,148,145,142,138,135,132,129,
+	126,123,120,117,113,110,107,104,101,98,95,92,89,86,83,80,
+	77,74,71,69,66,63,60,58,55,53,50,48,45,43,40,38,
+	36,34,32,30,28,26,24,22,20,19,17,16,14,13,11,10,
+	9,8,7,6,5,4,3,3,2,2,1,1,0,0,0,0,
+	0,0,0,1,1,1,2,2,3,4,4,5,6,7,8,9,
+	11,12,13,15,16,18,20,21,23,25,27,29,31,33,35,37,
+	39,42,44,46,49,51,54,56,59,62,64,67,70,73,76,79,
+	81,84,87,90,93,96,99,103,106,109,112,115,118,121,124,128,};
 
+//function headers
+void converter(int n);
+
+void converter(int n)
+{
+	// array to store binary number
+	int binaryNum[8] = {0,0,0,0,0,0,0,0};
+	
+	// counter for binary array
+	int i = 0;
+	//if (n == 0) i = 8; //set converter bits to zeros
+	
+	while (n > 0)
+	{
+		// storing remainder in binary array
+		binaryNum[i] = n % 2;
+		n = n / 2;
+		i++;
+	}
+	// printing binary array in reverse order
+	for (int j = 7; j >= 0; j--)
+	{
+		switch(j)
+		{
+			case 0:
+				if(binaryNum[j]) GPIO_write_high(&PORTB, DAC0);
+				else GPIO_write_low(&PORTB, DAC0);
+				break;
+			case 1:
+				if(binaryNum[j]) GPIO_write_high(&PORTB, DAC1);
+				else GPIO_write_low(&PORTB, DAC1);
+				break;
+			case 2:
+				if(binaryNum[j]) GPIO_write_high(&PORTB, DAC2);
+				else GPIO_write_low(&PORTB, DAC2);
+				break;
+			case 3:
+				if(binaryNum[j]) GPIO_write_high(&PORTB, DAC3);
+				else GPIO_write_low(&PORTB, DAC3);
+				break;
+			case 4:
+				if(binaryNum[j]) GPIO_write_high(&PORTB, DAC4);
+				else GPIO_write_low(&PORTB, DAC4);
+				break;
+			case 5:
+				if(binaryNum[j]) GPIO_write_high(&PORTB, DAC5);
+				else GPIO_write_low(&PORTB, DAC5);
+				break;
+			case 6:
+				if(binaryNum[j]) GPIO_write_high(&PORTB, DAC6);
+				else GPIO_write_low(&PORTB, DAC6);
+				break;
+			case 7:
+				if(binaryNum[j]) GPIO_write_high(&PORTB, DAC7);
+				else GPIO_write_low(&PORTB, DAC7);
+				break;
+			default:;
+		}
+	}
+}
 
 int main(void)
 {	
@@ -62,7 +137,7 @@ int main(void)
 
     // Configuration of 8-bit Timer/Counter0 for signal generator
     // Overflow interrupt every 128 us
-    TIM0_overflow_128us();
+    TIM0_overflow_1ms();
     TIM0_overflow_interrupt_enable();
 	
     // Configuration of 16-bit Timer/Counter0 for signal generator
@@ -109,379 +184,10 @@ ISR(TIMER1_OVF_vect)
 // Interrupts from Timer/Counter0 can generate 6 various signals
 ISR(TIMER0_OVF_vect)
 {
-	
-	
    if (keypad == 1)
     {
-       
-		switch(counter)
-		{
-			case 15:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_high(&PORTB, DAC4);
-				GPIO_write_high(&PORTB, DAC5);
-				GPIO_write_high(&PORTB, DAC6);
-				GPIO_write_high(&PORTB, DAC7);
-			break;
-			case 30:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_low(&PORTB, DAC5);
-				GPIO_write_high(&PORTB, DAC6);
-				GPIO_write_high(&PORTB, DAC7);
-			break;
-			case 62:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_low(&PORTB, DAC5);
-				GPIO_write_low(&PORTB, DAC6);
-				GPIO_write_high(&PORTB, DAC7);
-				break;
-			case 80:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_low(&PORTB, DAC5);
-				GPIO_write_high(&PORTB, DAC6);
-				GPIO_write_low(&PORTB, DAC7);
-			break;
-			case 100:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_high(&PORTB, DAC5);
-				GPIO_write_low(&PORTB, DAC6);
-				GPIO_write_low(&PORTB, DAC7);
-			break;
-			case 110:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_high(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_low(&PORTB, DAC5);
-				GPIO_write_low(&PORTB, DAC6);
-				GPIO_write_low(&PORTB, DAC7);
-			break;
-			case 125:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_low(&PORTB, DAC5);
-				GPIO_write_low(&PORTB, DAC6);
-				GPIO_write_low(&PORTB, DAC7);
-			break;
-			case 140:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_high(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_low(&PORTB, DAC5);
-				GPIO_write_low(&PORTB, DAC6);
-				GPIO_write_low(&PORTB, DAC7);
-			break;
-			case 150:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_high(&PORTB, DAC5);
-				GPIO_write_low(&PORTB, DAC6);
-				GPIO_write_low(&PORTB, DAC7);
-			break;
-			case 170:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_low(&PORTB, DAC5);
-				GPIO_write_high(&PORTB, DAC6);
-				GPIO_write_low(&PORTB, DAC7);
-			break;
-			case 192:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_low(&PORTB, DAC5);
-				GPIO_write_low(&PORTB, DAC6);
-				GPIO_write_high(&PORTB, DAC7);
-			break;
-			case 224:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_low(&PORTB, DAC4);
-				GPIO_write_low(&PORTB, DAC5);
-				GPIO_write_high(&PORTB, DAC6);
-				GPIO_write_high(&PORTB, DAC7);
-			break;
-			case 239:
-				GPIO_write_low(&PORTB, DAC0);
-				GPIO_write_low(&PORTB, DAC1);
-				GPIO_write_low(&PORTB, DAC2);
-				GPIO_write_low(&PORTB, DAC3);
-				GPIO_write_high(&PORTB, DAC4);
-				GPIO_write_high(&PORTB, DAC5);
-				GPIO_write_high(&PORTB, DAC6);
-				GPIO_write_high(&PORTB, DAC7);
-			break;
-			default: ;			
-		}
+		converter(sine[counter]);
 		counter++;
-	   if (counter == 256) counter = 0;
+	   if (counter > 256) counter = 0;
 	}
-// 		if (counter == 15)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_high(&PORTB, DAC4);
-//   			GPIO_write_high(&PORTB, DAC5);
-//   			GPIO_write_high(&PORTB, DAC6);
-//   			GPIO_write_high(&PORTB, DAC7);
-//   		}
-//   		
-//   		if (counter == 30)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_low(&PORTB, DAC5);
-//   			GPIO_write_high(&PORTB, DAC6);
-//   			GPIO_write_high(&PORTB, DAC7);
-//   		}
-//   		
-//   		if (counter == 62)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_low(&PORTB, DAC5);
-//   			GPIO_write_low(&PORTB, DAC6);
-//   			GPIO_write_high(&PORTB, DAC7);
-//   		}
-//   		if (counter == 80)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_low(&PORTB, DAC5);
-//   			GPIO_write_high(&PORTB, DAC6);
-//   			GPIO_write_low(&PORTB, DAC7);
-//   		}
-//   		if (counter == 100)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_high(&PORTB, DAC5);
-//   			GPIO_write_low(&PORTB, DAC6);
-//   			GPIO_write_low(&PORTB, DAC7);
-//   		}
-//   		
-//   		if (counter == 110)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_high(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_low(&PORTB, DAC5);
-//   			GPIO_write_low(&PORTB, DAC6);
-//   			GPIO_write_low(&PORTB, DAC7);
-//   		}
-//           if (counter == 125)
-//           {
-//               GPIO_write_low(&PORTB, DAC0);
-//               GPIO_write_low(&PORTB, DAC1);
-//               GPIO_write_low(&PORTB, DAC2);
-//               GPIO_write_low(&PORTB, DAC3);
-//               GPIO_write_low(&PORTB, DAC4);
-//               GPIO_write_low(&PORTB, DAC5);
-//               GPIO_write_low(&PORTB, DAC6);
-//               GPIO_write_low(&PORTB, DAC7);
-//           }
-//   		if (counter == 140)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_high(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_low(&PORTB, DAC5);
-//   			GPIO_write_low(&PORTB, DAC6);
-//   			GPIO_write_low(&PORTB, DAC7);
-//   		}
-//   		if (counter == 150)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_high(&PORTB, DAC5);
-//   			GPIO_write_low(&PORTB, DAC6);
-//   			GPIO_write_low(&PORTB, DAC7);
-//   		}
-//   		if (counter == 170)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_low(&PORTB, DAC5);
-//   			GPIO_write_high(&PORTB, DAC6);
-//   			GPIO_write_low(&PORTB, DAC7);
-//   		}
-//   		if (counter == 192)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_low(&PORTB, DAC5);
-//   			GPIO_write_low(&PORTB, DAC6);
-//   			GPIO_write_high(&PORTB, DAC7);
-//   		}
-//   		if (counter == 224)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_low(&PORTB, DAC4);
-//   			GPIO_write_low(&PORTB, DAC5);
-//   			GPIO_write_high(&PORTB, DAC6);
-//   			GPIO_write_high(&PORTB, DAC7);
-//   		}
-//   		if (counter == 239)
-//   		{
-//   			GPIO_write_low(&PORTB, DAC0);
-//   			GPIO_write_low(&PORTB, DAC1);
-//   			GPIO_write_low(&PORTB, DAC2);
-//   			GPIO_write_low(&PORTB, DAC3);
-//   			GPIO_write_high(&PORTB, DAC4);
-//   			GPIO_write_high(&PORTB, DAC5);
-//   			GPIO_write_high(&PORTB, DAC6);
-//   			GPIO_write_high(&PORTB, DAC7);
-//   		}
-//   		counter++;
-//           if (counter == 256) counter = 0;
-//       }
-// 	
-// 	if (keypad == 2)
-// 	{
-// 		if (counter == 0)
-// 		{
-// 			GPIO_write_high(&PORTB, DAC0);
-// 			GPIO_write_high(&PORTB, DAC1);
-// 			GPIO_write_high(&PORTB, DAC2);
-// 			GPIO_write_high(&PORTB, DAC3);
-// 			GPIO_write_high(&PORTB, DAC4);
-// 			GPIO_write_high(&PORTB, DAC5);	
-// 			GPIO_write_high(&PORTB, DAC6);
-// 			GPIO_write_high(&PORTB, DAC7);
-// 		}
-// 		counter ++;
-// 		if(counter == 200)
-// 		{
-// 			GPIO_write_low(&PORTB, DAC0);
-// 			GPIO_write_low(&PORTB, DAC1);
-// 			GPIO_write_low(&PORTB, DAC2);
-// 			GPIO_write_low(&PORTB, DAC3);
-// 			GPIO_write_low(&PORTB, DAC4);
-// 			GPIO_write_low(&PORTB, DAC5);
-// 			GPIO_write_low(&PORTB, DAC6);
-// 			GPIO_write_low(&PORTB, DAC7);
-// 		}
-		
-	
-	
-// 		uint8_t sinevalue = sinewave[counter];     //helping variable used to set output pin values
-//  		if (sinevalue-127>0)			    {GPIO_write_high(&PORTB, DAC7);  sinevalue=sinevalue-128;}         
-// 		else GPIO_write_low(&PORTB, DAC7);
-//   		if (sinevalue-63>0)                 {GPIO_write_high(&PORTB, DAC6); sinevalue=sinevalue-64;}
-//  		else GPIO_write_low(&PORTB, DAC6);
-//   		if (sinevalue-31>0)                 {GPIO_write_high(&PORTB, DAC5); sinevalue=sinevalue-32;}
-//   		else GPIO_write_low(&PORTB, DAC5);
-//   		if (sinevalue-15>0)                 {GPIO_write_high(&PORTB, DAC4); sinevalue=sinevalue-16;}
-//   		else GPIO_write_low(&PORTB, DAC4);
-//   		if (sinevalue-7>0)                  {GPIO_write_high(&PORTB, DAC3); sinevalue=sinevalue-8;}
-//  		else GPIO_write_low(&PORTB, DAC3);
-//   		if (sinevalue-3>0)                  {GPIO_write_high(&PORTB, DAC2); sinevalue=sinevalue-4;}
-//   		else GPIO_write_low(&PORTB, DAC2);
-//   		if (sinevalue-->0)                  {GPIO_write_high(&PORTB, DAC1); sinevalue=sinevalue-2;}
-//   		else GPIO_write_low(&PORTB, DAC1);
-//   		if (sinevalue>0)                    {GPIO_write_high(&PORTB, DAC0);}
-//   		else GPIO_write_low(&PORTB, DAC0);
-//  		counter++;
-		 
-  //		if (counter == 255) counter = 0;
-// 	
-// 		
-// 		 if (keypad == 3)
-// 		 {
-// 			 if (counter == 0)
-// 			 {
-// 				 GPIO_write_low(&PORTB, DAC0);
-// 				 GPIO_write_low(&PORTB, DAC1);
-// 				 GPIO_write_low(&PORTB, DAC2);
-// 				 GPIO_write_low(&PORTB, DAC3);
-// 				 GPIO_write_low(&PORTB, DAC4);
-// 				 GPIO_write_low(&PORTB, DAC5);
-// 				 GPIO_write_low(&PORTB, DAC6);
-// 				 GPIO_write_low(&PORTB, DAC7);
-// 			 }
-// 			 counter++;
-// 			 if (counter <= 127)
-// 			 {
-// 				
-// 				if (counter %1 == 0)		GPIO_toggle(&PORTB, DAC1);
-// 				if (counter %2 == 0)		GPIO_toggle(&PORTB, DAC2);
-// 				if (counter %4 == 0)		GPIO_toggle(&PORTB, DAC3);
-// 				if (counter %64 == 0)		GPIO_toggle(&PORTB, DAC7);
-// 				if (counter %16 == 0)		GPIO_toggle(&PORTB, DAC5);
-// 				if (counter %32 == 0)		GPIO_toggle(&PORTB, DAC6);
-// 				 if (counter %64 == 0)		GPIO_toggle(&PORTB, DAC7);
-// 			 }
-// 			 if (counter == 127) counter=1;
-// 		 }
-// 		
-// 	
-// }
-
-
-	
 }
