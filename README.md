@@ -1,3 +1,3 @@
-# Digital-electronics-2
+# Zadanie
 
 
