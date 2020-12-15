@@ -359,7 +359,7 @@ ISR(TIMER1_OVF_vect)
 		uart_puts("None input data... \r\n");
 	}
 	
-	if (keypad == 1)                                                                                        // keypad value = 1, sine wave generation
+	if (keypad == 1)                                                                                        
 	{
 		lcd_gotoxy(0, 1);
 		lcd_puts("																");
@@ -367,7 +367,7 @@ ISR(TIMER1_OVF_vect)
 		lcd_puts("SINE WAVE");
 		uart_puts("DTMF low f = 697Hz and high f = 1209Hz. \r\n");
 	}
-	if (keypad == 2)                                                                                        // keypad value = 2, square wave generation
+	if (keypad == 2)                                                                                        
 	{
 		lcd_gotoxy(0, 1);
 		lcd_puts("																");
@@ -375,7 +375,7 @@ ISR(TIMER1_OVF_vect)
 		lcd_puts("TRIANGLE WAVE");
 		uart_puts("DTMF low f = 697Hz and high f = 1336Hz. \r\n");
 	}
-	if (keypad == 3)                                                                                        // keypad value = 3, rising sawtooth wave generation
+	if (keypad == 3)                                                                                        
 	{
 		lcd_gotoxy(0, 1);
 		lcd_puts("																");
@@ -383,7 +383,7 @@ ISR(TIMER1_OVF_vect)
 		lcd_puts("EXPONENTIAL WAVE");
 		uart_puts("DTMF low f = 697Hz and high f = 1477Hz. \r\n");
 	}
-	if (keypad == 4)                                                                                        // keypad value = 4, falling sawtooth wave generation
+	if (keypad == 4)                                                                                        
 	{
 		lcd_gotoxy(0, 1);
 		lcd_puts("																");
@@ -391,7 +391,7 @@ ISR(TIMER1_OVF_vect)
 		lcd_puts("SQUARE WAVE");
 		uart_puts("DTMF low f = 770Hz and high f = 1209Hz. \r\n");
 	}
-	if (keypad == 5)                                                                                        // keypad value = 5, triangle wave generation
+	if (keypad == 5)                                                                                        
 	{
 		lcd_gotoxy(0, 1);
 		lcd_puts("																");
@@ -399,7 +399,7 @@ ISR(TIMER1_OVF_vect)
 		lcd_puts("DIRAC PULSES");
 		uart_puts("DTMF low f = 770Hz and high f = 1336Hz. \r\n");
 	}
-	if (keypad == 6)                                                                                        // keypad value = 6, dirac pulses generation
+	if (keypad == 6)                                                                                        
 	{
 		lcd_gotoxy(0, 1);
 		lcd_puts("																");
