@@ -26,13 +26,11 @@
 #include <inttypes.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#ifndef F_CPU
+#define F_CPU 16000000      // CPU frequency in Hz required for delay func
+#endif
 #include <util/delay.h>
 #include "lcd.h"
-#ifndef F_CPU
-#define F_CPU 16000000
-#endif
-
-
 
 
 /*

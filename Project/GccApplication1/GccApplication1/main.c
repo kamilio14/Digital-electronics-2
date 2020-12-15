@@ -1,3 +1,4 @@
+
 /* Defines -----------------------------------------------------------*/
 #define KEYPAD0     PC0     // AVR pin where keypad is connected
 #define KEYPAD1     PC1     // AVR pin where keypad is connected
@@ -80,7 +81,7 @@ uint8_t decay[256] ={0,4,8,11,15,19,22,26,29,33,36,39,43,46,49,52,
 	242,243,243,243,243,243,243,243,243,243,244,244,244,244,244,244,
 244,244,244,244,244,245,245,245,245,245,245,245,245,245,245,245,};
 
-int sinn[20] ={120,157,191,217,234,240,234,217,
+uint8_t sinn[20] ={120,157,191,217,234,240,234,217,
 	191,157,120,83,49,23,6,0,
 6,23,49,83,120,};
 //function headers
@@ -178,7 +179,7 @@ int main(void)
     TIM0_overflow_1ms();
     TIM0_overflow_interrupt_enable();
 	
-    // Configuration of 16-bit Timer/Counter0 for signal generator
+    // Configuration of 16-bit Timer/Counter1 for signal generator
     // Overflow interrupt every 262 us
     TIM1_overflow_262ms();
     TIM1_overflow_interrupt_enable();
@@ -204,6 +205,7 @@ int main(void)
 // Interrupts from Timer/Counter0 can generate 6 various signals
 ISR(TIMER0_OVF_vect)
 {
+	// Sine
 	if (keypad == 1)
 	{
 		converter(sine[counter]);
@@ -211,19 +213,24 @@ ISR(TIMER0_OVF_vect)
 		if (counter > 255) counter = 0;
 	}
 	
+	// Triangle
 	if (keypad ==2)
 	{
 		converter(triangle[counter]);
 		counter++;
 		if (counter > 255) counter = 0;
 	}
-	if (keypad ==3)
+	
+	// Exponential wave
+	if (keypad == 3)
 	{
 		converter(decay[counter]);
 		counter++;
 		if (counter > 255) counter = 0;
 	}
-	if (keypad == 4)   //square
+	
+	// Square
+	if (keypad == 4)
 	{
 		if (counter == 0)
 		{
@@ -251,6 +258,7 @@ ISR(TIMER0_OVF_vect)
 		if (counter == 255) counter = 0;
 		
 	}
+	// Dirac
 	if (keypad == 5)
 	{
 		if (counter == 255)
@@ -282,19 +290,19 @@ ISR(TIMER0_OVF_vect)
 		counter++;
 	}
 	
-	if (keypad ==6)
+	// Noise
+	if (keypad == 6)
 	{
 		converter(sinn[counter]);
 		counter++;
 		if (counter > 20) counter = 0;
 	}
-	
 }
 
-// Interrupts from Timer/Counter1 control Keypad, Display and UART
+// Interrupts from Timer/Counter1 are keypad drivers
 ISR(TIMER1_OVF_vect)
 {
-    // keypad first row
+    // Keypad first row
     GPIO_write_high(&PORTC, KEYPAD3);
     GPIO_write_low(&PORTC, KEYPAD4);
     GPIO_write_low(&PORTC, KEYPAD5);
@@ -305,7 +313,8 @@ ISR(TIMER1_OVF_vect)
     {keypad = 2; counter=0;}
     if (GPIO_read(&PINC, KEYPAD2) == 1)
     {keypad = 3; counter=0;}
-    // keypad secónd row
+		
+    // Keypad second row
     GPIO_write_low(&PORTC, KEYPAD3);
     GPIO_write_high(&PORTC, KEYPAD4);
     GPIO_write_low(&PORTC, KEYPAD5);
@@ -316,91 +325,140 @@ ISR(TIMER1_OVF_vect)
     {keypad = 5; counter=0;}
     if (GPIO_read(&PINC, KEYPAD2) == 1)
     {keypad = 6; counter=0;}
-    // keypad third row
+		
+    // Keypad third row
     GPIO_write_low(&PORTC, KEYPAD3);
     GPIO_write_low(&PORTC, KEYPAD4);
     GPIO_write_high(&PORTC, KEYPAD5);
     GPIO_write_low(&PORTC, KEYPAD6);
     if (GPIO_read(&PINC, KEYPAD0) == 1)
-    {keypad = 4; counter=0;}
+    {keypad = 7; counter=0;}
     if (GPIO_read(&PINC, KEYPAD1) == 1)
-    {keypad = 5; counter=0;}
+    {keypad = 8; counter=0;}
     if (GPIO_read(&PINC, KEYPAD2) == 1)
-    {keypad = 6; counter=0;}
+    {keypad = 9; counter=0;}
+		
+	// Keypad third fourth
+	GPIO_write_low(&PORTC, KEYPAD3);
+	GPIO_write_low(&PORTC, KEYPAD4);
+	GPIO_write_low(&PORTC, KEYPAD5);
+	GPIO_write_high(&PORTC, KEYPAD6);
+	if (GPIO_read(&PINC, KEYPAD0) == 1)
+	{keypad = 10; counter=0;}
+	if (GPIO_read(&PINC, KEYPAD1) == 1)
+	{keypad = 11; counter=0;}
+	if (GPIO_read(&PINC, KEYPAD2) == 1)
+	{keypad = 12; counter=0;}	
 
-    // Displaying chosen signal on an LCD and UART transmitting
+    // Displaying information text by LCD and UART
 	
 	if (keypad == 0)
 	{
 		lcd_gotoxy(0, 1);
-		lcd_puts("					");			
-		lcd_gotoxy(0, 1);
-		lcd_puts("None input data");
-		uart_puts("None input data... \r\n ,,, DTMF keypad frequencies ... \r\n");
-		
+		lcd_puts("						");
+		uart_puts("None input data... \r\n");
 	}
 	
-    if (keypad == 1)                                                                                        // keypad value = 1, sine wave generation
-    {
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("					");
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("SINE WAVE");
-		int x1 = 0;
-		++x1;
-	    if (x1 == 1)
-	    {
-			uart_puts("Output signal - Sine wave... \r\n");
-	    }
-		
-    }
-    if (keypad == 2)                                                                                        // keypad value = 2, square wave generation
-    {
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("					");
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("SQUARE WAVE");
-	    uart_puts("Output signal - Square wave... \r\n");
-    }
-    if (keypad == 3)                                                                                        // keypad value = 3, rising sawtooth wave generation
-    {
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("					");
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("RISING SAWTOOTH");
-	    uart_puts("Output signal - Rising sawtooth wave... \r\n");
-    }
-    if (keypad == 4)                                                                                        // keypad value = 4, falling sawtooth wave generation
-    {
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("					");
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("FALLING SAWTOOTH");
-	    uart_puts("Output signal - Falling sawtooth wave... \r\n");
-    }
-    if (keypad == 5)                                                                                        // keypad value = 5, triangle wave generation
-    {
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("					");
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("TRIANGLE");
-	    uart_puts("Output signal - Triangle wave... \r\n");
-    }
-    if (keypad == 6)                                                                                        // keypad value = 6, dirac pulses generation
-    {
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("					");
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("DIRAC PULSES");
-	    uart_puts("Output signal - Dirac pulses... \r\n");
-    }
-    if ((keypad == 7)||(keypad == 8)||(keypad == 9)||(keypad == 10)||(keypad == 11)||(keypad == 12))        // keypad value = (7|8|9|10|11|12), 0V generation
-    {
-	    lcd_gotoxy(0, 1);
-	    lcd_puts("					");
-	    lcd_gotoxy(0, 1);
-	    lcd_puts(" ---- None ---- ");
-	    uart_puts("Output signal: ---- None ---- \r\n");
-    }
+	if (keypad == 1)                                                                                        // keypad value = 1, sine wave generation
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("SINE WAVE");
+		uart_puts("DTMF low f = 697Hz and high f = 1209Hz. \r\n");
+	}
+	if (keypad == 2)                                                                                        // keypad value = 2, square wave generation
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("TRIANGLE WAVE");
+		uart_puts("DTMF low f = 697Hz and high f = 1336Hz. \r\n");
+	}
+	if (keypad == 3)                                                                                        // keypad value = 3, rising sawtooth wave generation
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("EXPONENTIAL WAVE");
+		uart_puts("DTMF low f = 697Hz and high f = 1477Hz. \r\n");
+	}
+	if (keypad == 4)                                                                                        // keypad value = 4, falling sawtooth wave generation
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("SQUARE WAVE");
+		uart_puts("DTMF low f = 770Hz and high f = 1209Hz. \r\n");
+	}
+	if (keypad == 5)                                                                                        // keypad value = 5, triangle wave generation
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("DIRAC PULSES");
+		uart_puts("DTMF low f = 770Hz and high f = 1336Hz. \r\n");
+	}
+	if (keypad == 6)                                                                                        // keypad value = 6, dirac pulses generation
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("NOISE SINUS WAVE");
+		uart_puts("DTMF low f = 770Hz and high f = 1477Hz. \r\n");
+	}
 	
-    }
+	if (keypad == 7)
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("RESET");
+		uart_puts("DTMF low f = 852Hz and high f = 1209Hz. \r\n");
+	}
+	
+	if (keypad == 8)
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("RESET");
+		uart_puts("DTMF low f = 852Hz and high f = 1336Hz. \r\n");
+	}
+	
+	if (keypad == 9)
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("RESET");
+		uart_puts("DTMF low f = 852Hz and high f = 1477Hz. \r\n");
+	}
+	
+	if (keypad == 10)
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("RESET");
+		uart_puts("DTMF low f = 941Hz and high f = 1209Hz. \r\n");
+	}
+	
+	if (keypad == 11)
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("RESET");
+		uart_puts("DTMF low f = 941Hz and high f = 1336Hz. \r\n");
+	}
+	
+	if (keypad == 12)
+	{
+		lcd_gotoxy(0, 1);
+		lcd_puts("																");
+		lcd_gotoxy(0, 1);
+		lcd_puts("RESET");
+		uart_puts("DTMF low f = 941Hz and high f = 1477Hz. \r\n");
+	}
+}
