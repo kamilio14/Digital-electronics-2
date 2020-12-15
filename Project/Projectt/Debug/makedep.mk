@@ -4,5 +4,9 @@
 
 gpio.c
 
+lcd.c
+
 main.c
+
+uart.c
 
